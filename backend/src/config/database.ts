@@ -41,14 +41,16 @@ export const initDatabase = async () => {
     `);
 
     // Create calculations table
+    // Using NUMERIC(38, 10) which allows up to 28 digits before decimal and 10 after
+    // This matches JavaScript's safe integer range (2^53 - 1)
     await client.query(`
       CREATE TABLE IF NOT EXISTS calculations (
         id SERIAL PRIMARY KEY,
         user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         parent_id INTEGER REFERENCES calculations(id) ON DELETE CASCADE,
         operation_type VARCHAR(20),
-        operand DECIMAL(20, 10) NOT NULL,
-        result DECIMAL(20, 10) NOT NULL,
+        operand NUMERIC(38, 10) NOT NULL,
+        result NUMERIC(38, 10) NOT NULL,
         depth INTEGER NOT NULL DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT check_operation_type CHECK (

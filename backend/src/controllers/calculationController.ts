@@ -91,8 +91,12 @@ export class CalculationController {
         res.status(404).json({ error: error.message });
       } else if (error.message === 'Division by zero is not allowed') {
         res.status(400).json({ error: error.message });
+      } else if (error.message.includes('too large') || error.message.includes('overflow') || error.message.includes('numeric field overflow')) {
+        res.status(400).json({ error: error.message || 'Number is too large. Please use smaller numbers.' });
+      } else if (error.message.includes('not finite') || error.message.includes('Infinity') || error.message.includes('NaN')) {
+        res.status(400).json({ error: 'Invalid number. Please enter a valid number.' });
       } else {
-        res.status(500).json({ error: 'Failed to create calculation' });
+        res.status(500).json({ error: error.message || 'Failed to create calculation' });
       }
     }
   }

@@ -10,6 +10,7 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "migrate": "tsx src/utils/migrate.ts",
+    "migrate-numeric": "tsx src/utils/migrate-numeric.ts",
     "init-db": "tsx src/utils/init-db.ts"
   },
   "dependencies": {

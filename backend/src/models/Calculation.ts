@@ -1,30 +1,67 @@
 import { pool } from '../config/database';
 import { Calculation, OperationType, CalculationTree } from '../types';
 
+// Constants for number validation
+const MAX_SAFE_NUMBER = 9999999999999999999999999999; // 28 digits (safe for NUMERIC(38,10))
+const MIN_SAFE_NUMBER = -9999999999999999999999999999;
+
 export class CalculationModel {
+  // Validate number is within safe range
+  static validateNumber(value: number): void {
+    if (!Number.isFinite(value)) {
+      throw new Error('Number is not finite (Infinity or NaN)');
+    }
+    
+    if (value > MAX_SAFE_NUMBER || value < MIN_SAFE_NUMBER) {
+      throw new Error(`Number is too large. Maximum allowed: ±${MAX_SAFE_NUMBER.toLocaleString()}`);
+    }
+  }
+
   static calculateResult(
     parentResult: number,
     operation: OperationType,
     operand: number
   ): number {
+    // Validate inputs
+    this.validateNumber(parentResult);
+    this.validateNumber(operand);
+
+    let result: number;
+    
     switch (operation) {
       case OperationType.ADD:
-        return parentResult + operand;
+        result = parentResult + operand;
+        break;
       case OperationType.SUBTRACT:
-        return parentResult - operand;
+        result = parentResult - operand;
+        break;
       case OperationType.MULTIPLY:
-        return parentResult * operand;
+        result = parentResult * operand;
+        // Check for overflow in multiplication
+        if (!Number.isFinite(result)) {
+          throw new Error('Multiplication result is too large (overflow)');
+        }
+        break;
       case OperationType.DIVIDE:
         if (operand === 0) {
           throw new Error('Division by zero is not allowed');
         }
-        return parentResult / operand;
+        result = parentResult / operand;
+        break;
       default:
         throw new Error('Invalid operation type');
     }
+
+    // Validate result
+    this.validateNumber(result);
+    
+    return result;
   }
 
   static async createRoot(userId: number, operand: number): Promise<Calculation> {
+    // Validate operand before inserting
+    this.validateNumber(operand);
+    
     const result = await pool.query(
       `INSERT INTO calculations (user_id, parent_id, operation_type, operand, result, depth)
        VALUES ($1, NULL, NULL, $2, $2, 0)
@@ -141,11 +178,11 @@ export class CalculationModel {
     const calculationsMap = new Map<number, CalculationTree>();
     const roots: CalculationTree[] = [];
 
-    result.rows.forEach((row) => {
+    result.rows.forEach((row: any) => {
       calculationsMap.set(row.id, { ...row, children: [] });
     });
 
-    result.rows.forEach((row) => {
+    result.rows.forEach((row: any) => {
       const node = calculationsMap.get(row.id)!;
       if (row.parent_id === null) {
         roots.push(node);
