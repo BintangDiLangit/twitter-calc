@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CalculationTree, OperationType } from '../types';
-import { Plus, Minus, X, Divide, Trash2, PlusCircle } from 'lucide-react';
+import { Trash2, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 
