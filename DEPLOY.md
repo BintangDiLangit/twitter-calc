@@ -281,6 +281,3 @@ Once connected to GitHub:
 4. ✅ Share your URL!
 
 Your app will be live at: `https://your-app-name.vercel.app`
-
-🎉 **Congratulations! Your app is now deployed!**
-
