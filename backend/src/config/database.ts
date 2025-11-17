@@ -3,20 +3,28 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Adjust connection pool for serverless (Vercel)
+// Serverless functions need smaller pools and shorter timeouts
+const isServerless = process.env.VERCEL === '1' || process.env.AWS_LAMBDA_FUNCTION_NAME;
+
 export const pool = new Pool({
   host: process.env.DB_HOST || 'localhost',
   port: parseInt(process.env.DB_PORT || '5432'),
   database: process.env.DB_NAME || 'calculation_tree',
   user: process.env.DB_USER || 'postgres',
   password: process.env.DB_PASSWORD || 'postgres',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  max: isServerless ? 2 : 20, // Smaller pool for serverless
+  idleTimeoutMillis: isServerless ? 10000 : 30000,
+  connectionTimeoutMillis: isServerless ? 5000 : 2000,
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
 });
 
 pool.on('error', (err) => {
   console.error('Unexpected error on idle client', err);
-  process.exit(-1);
+  // Don't exit in serverless environment
+  if (!isServerless) {
+    process.exit(-1);
+  }
 });
 
 export const initDatabase = async () => {
