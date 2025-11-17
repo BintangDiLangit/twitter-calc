@@ -3,7 +3,6 @@ import { CalculationTree, OperationType } from '../types';
 import { Plus, Minus, X, Divide, Trash2, PlusCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import clsx from 'clsx';
 
 interface CalculationNodeProps {
   node: CalculationTree;
@@ -11,13 +10,6 @@ interface CalculationNodeProps {
   onDelete: (id: number) => void;
   depth?: number;
 }
-
-const operationIcons: Record<OperationType, React.ReactNode> = {
-  [OperationType.ADD]: <Plus size={16} />,
-  [OperationType.SUBTRACT]: <Minus size={16} />,
-  [OperationType.MULTIPLY]: <X size={16} />,
-  [OperationType.DIVIDE]: <Divide size={16} />,
-};
 
 const operationColors: Record<OperationType, string> = {
   [OperationType.ADD]: 'var(--op-add)',

@@ -29,7 +29,7 @@ Since you already have your database server, deploying to Vercel is straightforw
 4. **Import your GitHub repository**
 5. **Configure Project**:
    - **Framework Preset**: Other
-   - **Root Directory**: `./` (leave as root)
+   - **Root Directory**: Leave **EMPTY** (don't use `./` - Vercel doesn't allow it)
    - **Build Command**: `cd frontend && npm install && npm run build`
    - **Output Directory**: `frontend/dist`
    - **Install Command**: `npm install` (for root dependencies)
